@@ -55,21 +55,13 @@ pub mod tile_mapper {
 
             // if no tile with `content` is in the list, it creates a new entry with that keyword
             // otherwise coordinates and value are added to the already existing vector
-
-            if !list.contains_key(&content) {
-                let mut vec: Vec<((usize, usize) , (Option<usize>, Option<Range<usize>>))> = Vec::new();
-                vec.push((coord, value));
-                // list.insert(content, vec);
-                list.entry(content).or_insert(vec);
-            }
-            else if list.contains_key(&content) {
-                list.entry(content).and_modify(|v| {
-                    v.push((coord, value))
-                });
-            }
+            list.entry(content)
+                .and_modify(|v| v.push((coord, value.clone())))
+                .or_insert(vec![(coord, value)]);
         }
     }
 }
+
 
 
 fn main() {
