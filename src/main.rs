@@ -62,11 +62,9 @@ pub mod tile_mapper {
                 list.insert(content, vec);
             }
             else if list.contains_key(&content) {
-                if let Some(v) = list.get(&content) {
-                    let mut vec = v.clone();
-                    vec.push((coord, value));
-                    list.insert(content, vec);
-                }
+                list.entry(content).and_modify(|v| {
+                    v.push((coord, value))
+                });
             }
         }
     }
