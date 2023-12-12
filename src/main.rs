@@ -25,24 +25,19 @@ pub mod tile_mapper {
             match robot_map(&world) {
                 None => {return None;},
                 Some(robot_world) => {
-                    let mut row = 0;
 
                     // iterate through every tile in the world
 
-                    for rows in robot_world.iter() {
-                        let mut col = 0;
-                        for element in rows.iter() {
-                            //check if the tile has been discovered
+                    for (row,row_vector) in robot_world.iter().enumerate() {
+                        for (column, element) in row_vector.iter().enumerate() {
                             match element {
                                 None => {}
                                 Some(tile) => {
                                     // call the `insert_in_map` function defined below
-                                    TileMapper::insert_in_map(tile, &mut object_list, row, col)
+                                    TileMapper::insert_in_map(tile, &mut object_list, row, column)
                                 }
                             }
-                            col += 1;
                         }
-                        row += 1;
                     }
                 }
             }
@@ -81,5 +76,19 @@ pub mod tile_mapper {
 fn main() {
     println!("============================");
     println!("PLEASE BUY ME, UNCLE PEAR :)");
-    println!("============================");
+    println!("============================\n");
+    println!("               /¯¯¯____");
+    println!("              /----¯¯¯");
+    println!("             /");
+    println!("          ^^ ^^");
+    println!("         //   \\\\");
+    println!("        //     \\\\");
+    println!("      //         \\\\");
+    println!("    //             \\\\");
+    println!("    //             \\\\");
+    println!("    //             \\\\");
+    println!("     //           \\\\");
+    println!("      //         \\\\");
+    println!("       \\|||||||||/");
+
 }
