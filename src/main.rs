@@ -59,7 +59,8 @@ pub mod tile_mapper {
             if !list.contains_key(&content) {
                 let mut vec: Vec<((usize, usize) , (Option<usize>, Option<Range<usize>>))> = Vec::new();
                 vec.push((coord, value));
-                list.insert(content, vec);
+                // list.insert(content, vec);
+                list.entry(content).or_insert(vec);
             }
             else if list.contains_key(&content) {
                 list.entry(content).and_modify(|v| {
