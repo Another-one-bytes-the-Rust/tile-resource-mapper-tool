@@ -3,15 +3,20 @@ pub mod tile_mapper {
     use std::collections::HashMap;
     use std::ops::Range;
     use robotics_lib::interface::{robot_map, Tools};
-    use robotics_lib::runner::{Robot, Runnable};
+    use robotics_lib::runner::{Runnable};
+    use robotics_lib::utils::LibError;
+    use robotics_lib::utils::LibError::NoContent;
     use robotics_lib::world::tile::{Content, Tile};
     use robotics_lib::world::World;
+    use crate::coordinates::map_coordinate::MapCoordinate;
+
 
     pub struct TileMapper {}
 
     impl Tools for TileMapper {}
 
-    type Coordinates = (usize, usize);
+
+    // type Coordinates = (usize, usize);
     type ContentQuantity = (Option<usize>, Option<Range<usize>>);
 
     impl TileMapper {
@@ -20,10 +25,12 @@ pub mod tile_mapper {
         /// It returns a `HashMap` where `key` is the element searched and `value` is a vector of tuples,
         /// The tuple stores the coordinates of a tile in another tuple, and the number of elements contained in that tile
 
-        fn collection(world: &World) -> Option<HashMap<Content, Vec<(Coordinates, ContentQuantity)>>> {
+        pub fn collection(world: &World) -> Option<HashMap<Content, Vec<(MapCoordinate, ContentQuantity)>>> {
 
             // HashMap instantiation
-            let mut object_list: HashMap<Content, Vec<(Coordinates, ContentQuantity)>> = HashMap::new();
+            let mut object_list: HashMap<Content, Vec<(MapCoordinate, ContentQuantity)>> = HashMap::new();
+
+            let mut coord = MapCoordinate::new(0,0);
 
             // check whether the world has been already discovered or not
             match robot_map(&world) {
@@ -49,32 +56,40 @@ pub mod tile_mapper {
             Some(object_list)
         }
 
-        fn insert_in_map(tile: &Tile , list: &mut HashMap<Content, Vec<(Coordinates, ContentQuantity)>>, row: usize, col: usize) {
+        fn insert_in_map(tile: &Tile , list: &mut HashMap<Content, Vec<(MapCoordinate, ContentQuantity)>>, row: usize, col: usize) {
 
             /// This function inserts the coordinates of a `tile` and the number of elements in that `tile`
 
-            let coord: Coordinates = (row, col);
+            let coord = (row, col);
             let value: ContentQuantity = tile.content.get_value();
             let content = tile.content.clone();
 
             // if no tile with `content` is in the list, it creates a new entry with that keyword
             // otherwise coordinates and value are added to the already existing vector
             list.entry(content)
-                .and_modify(|v| v.push((coord, value.clone())))
-                .or_insert(vec![(coord, value)]);
+                .and_modify(|v| v.push((coord.into(), value.clone())))
+                .or_insert(vec![(coord.into(), value)]);
         }
 
-        fn find_closest(world: &World, robot: & impl Runnable) -> Coordinates {
+        pub fn find_closest(world: &World, robot: & impl Runnable, content: Content) -> Result<MapCoordinate, LibError> {
             let map = TileMapper::collection(world);
             todo!()
         }
 
-        fn find_most_loaded(world: &World) -> (Coordinates, ContentQuantity) {
+        pub fn find_most_loaded(world: &World, robot: & impl Runnable, content: Content) -> Result<MapCoordinate, LibError> {
             let map = TileMapper::collection(world);
+
+            if let Some(Map) = map {
+
+                if Map.contains_key(&content) {
+
+                } else {
+                    return Err(NoContent);
+                }
+
+            }
             todo!()
         }
     }
 }
 
-
-fn main() {}
