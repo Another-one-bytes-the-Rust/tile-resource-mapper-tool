@@ -6,7 +6,6 @@ pub mod tile_mapper {
     use robotics_lib::interface::{robot_map, Tools};
     use robotics_lib::runner::{Runnable};
     use robotics_lib::utils::LibError;
-    use robotics_lib::utils::LibError::NoContent;
     use robotics_lib::world::tile::{Content, Tile};
     use robotics_lib::world::World;
     use crate::coordinates::map_coordinate::MapCoordinate;
@@ -17,8 +16,6 @@ pub mod tile_mapper {
 
     impl Tools for TileMapper {}
 
-
-    // type Coordinates = (usize, usize);
     type ContentQuantity = (Option<usize>, Option<Range<usize>>);
 
 
@@ -73,50 +70,50 @@ pub mod tile_mapper {
         }
 
         pub fn find_closest(world: &World, robot: & impl Runnable, content: Content) -> Result<MapCoordinate, LibError> {
-            let map = TileMapper::collection(world);
+            let hashmap = TileMapper::collection(world);
             todo!()
         }
 
         pub fn find_most_loaded(world: &World, robot: & impl Runnable, content: Content) -> Result<MapCoordinate, Box<dyn Error>> {
-            let map = TileMapper::collection(world);
-
+            let hashmap = TileMapper::collection(world);
             // check if the world has already been discovered
-            match map {
-                Some(Map) => {
+            match hashmap {
+                Some(map) => {
                     // check if the hashmap contains the searched content
-                    return if Map.contains_key(&content) {
-                        let vec = Map.get(&content);
+                    return if map.contains_key(&content) {
+                        let vec = map.get(&content);
+                        let mut coordinates = MapCoordinate::new(0,0);
                         if let Some(v) = vec {
 
                             // instantiate some variables
                             let mut quantity: usize = 0;
                             let mut range: Range<usize> = 0..0;
-                            let mut coordinates = MapCoordinate::new(0,0);
                             // iterate through the vector and search for the most loaded tile
-                            for Content_Info in v.iter() {
+                            for content_info in v.iter() {
 
                                 // get and set coordinates of the last discovered tile with the higher amount of content
-                                match &Content_Info.1 {
+                                match &content_info.1 {
+                                    // TODO! if two tiles have the same quantity, return the closest
                                     (Some(q), None) => {
                                         if q >= &quantity {
                                             quantity = q.clone();
-                                            coordinates.set_width(Content_Info.0.get_width());
-                                            coordinates.set_height(Content_Info.0.get_height());
+                                            coordinates.set_width(content_info.0.get_width());
+                                            coordinates.set_height(content_info.0.get_height());
                                         }
                                     },
                                     (None, Some(r)) => {
                                         if r.clone().cmp(&mut range) == std::cmp::Ordering::Greater
                                             || r.clone().cmp(&mut range) == std::cmp::Ordering::Equal {
                                             range = r.clone();
-                                            coordinates.set_width(Content_Info.0.get_width());
-                                            coordinates.set_height(Content_Info.0.get_height());
+                                            coordinates.set_width(content_info.0.get_width());
+                                            coordinates.set_height(content_info.0.get_height());
                                         }
                                     },
                                     (_, _) => {}
                                 }
                             }
                         }
-                        Ok(MapCoordinate::new(0, 0))
+                        Ok(coordinates)
                     } else {
                         Err(Box::new(ContentNotDiscovered))
                     }
