@@ -30,8 +30,6 @@ pub mod tile_mapper {
             // HashMap instantiation
             let mut object_list: HashMap<Content, Vec<(MapCoordinate, ContentQuantity)>> = HashMap::new();
 
-            let mut coord = MapCoordinate::new(0,0);
-
             // check whether the world has been already discovered or not
             match robot_map(&world) {
                 None => {return None;},
@@ -52,7 +50,7 @@ pub mod tile_mapper {
                     }
                 }
             }
-            // returns the HashMap
+            // return the HashMap
             Some(object_list)
         }
 
@@ -92,4 +90,3 @@ pub mod tile_mapper {
         }
     }
 }
-
