@@ -1,6 +1,7 @@
 pub mod tile_mapper {
 
     use std::collections::HashMap;
+    use std::error::Error;
     use std::ops::Range;
     use robotics_lib::interface::{robot_map, Tools};
     use robotics_lib::runner::{Runnable};
@@ -9,6 +10,7 @@ pub mod tile_mapper {
     use robotics_lib::world::tile::{Content, Tile};
     use robotics_lib::world::World;
     use crate::coordinates::map_coordinate::MapCoordinate;
+    use crate::errors::tool_errors::ToolError::{ContentNotDiscovered, WorldNotDiscovered};
 
 
     pub struct TileMapper {}
@@ -18,6 +20,7 @@ pub mod tile_mapper {
 
     // type Coordinates = (usize, usize);
     type ContentQuantity = (Option<usize>, Option<Range<usize>>);
+
 
     impl TileMapper {
 
@@ -74,19 +77,52 @@ pub mod tile_mapper {
             todo!()
         }
 
-        pub fn find_most_loaded(world: &World, robot: & impl Runnable, content: Content) -> Result<MapCoordinate, LibError> {
+        pub fn find_most_loaded(world: &World, robot: & impl Runnable, content: Content) -> Result<MapCoordinate, Box<dyn Error>> {
             let map = TileMapper::collection(world);
 
-            if let Some(Map) = map {
+            // check if the world has already been discovered
+            match map {
+                Some(Map) => {
+                    // check if the hashmap contains the searched content
+                    return if Map.contains_key(&content) {
+                        let vec = Map.get(&content);
+                        if let Some(v) = vec {
 
-                if Map.contains_key(&content) {
+                            // instantiate some variables
+                            let mut quantity: usize = 0;
+                            let mut range: Range<usize> = 0..0;
+                            let mut coordinates = MapCoordinate::new(0,0);
+                            // iterate through the vector and search for the most loaded tile
+                            for Content_Info in v.iter() {
 
-                } else {
-                    return Err(NoContent);
+                                // get and set coordinates of the last discovered tile with the higher amount of content
+                                match &Content_Info.1 {
+                                    (Some(q), None) => {
+                                        if q >= &quantity {
+                                            quantity = q.clone();
+                                            coordinates.set_width(Content_Info.0.get_width());
+                                            coordinates.set_height(Content_Info.0.get_height());
+                                        }
+                                    },
+                                    (None, Some(r)) => {
+                                        if r.clone().cmp(&mut range) == std::cmp::Ordering::Greater
+                                            || r.clone().cmp(&mut range) == std::cmp::Ordering::Equal {
+                                            range = r.clone();
+                                            coordinates.set_width(Content_Info.0.get_width());
+                                            coordinates.set_height(Content_Info.0.get_height());
+                                        }
+                                    },
+                                    (_, _) => {}
+                                }
+                            }
+                        }
+                        Ok(MapCoordinate::new(0, 0))
+                    } else {
+                        Err(Box::new(ContentNotDiscovered))
+                    }
                 }
-
+                None => Err(Box::new(WorldNotDiscovered))
             }
-            todo!()
         }
     }
 }
