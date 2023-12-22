@@ -1,5 +1,5 @@
-pub mod coordinates;
-pub mod errors;
 pub mod tool;
+mod coordinates;
+mod errors;
 #[cfg(test)]
 mod tests;
