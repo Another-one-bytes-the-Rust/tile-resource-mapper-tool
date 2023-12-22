@@ -95,7 +95,39 @@ pub mod tile_mapper {
 
         pub fn find_closest(&self, world: &World, robot: &impl Runnable, content: Content) -> Result<MapCoordinate, Box<dyn Error>> {
             let hashmap = TileMapper::collection(world);
-            todo!()
+            match hashmap {
+                Some(map) => {
+                    // check if the hashmap contains the searched content
+                    let cont = TileMapper::match_content(&content);
+                    return if map.contains_key(&cont) {
+                        let vec = map.get(&cont);
+                        let width = robot.get_coordinate().get_col();
+                        let height = robot.get_coordinate().get_row();
+                        let robot_coordinates = MapCoordinate::new(width, height);
+                        let mut coordinates = MapCoordinate::new(0, 0);
+                        if let Some(v) = vec {
+                            // iterate through the vector and search for the closest tile
+                            for (index, content_info) in v.iter().enumerate() {
+                                if index == 0 {
+                                    coordinates.set_width(content_info.0.get_width());
+                                    coordinates.set_height(content_info.0.get_height());
+                                } else {
+                                    let old_distance = coordinates.get_distance(&robot_coordinates);
+                                    let new_distance = content_info.0.get_distance(&robot_coordinates);
+                                    if new_distance < old_distance {
+                                        coordinates.set_width(content_info.0.get_width());
+                                        coordinates.set_height(content_info.0.get_height());
+                                    }
+                                }
+                            }
+                        }
+                        Ok(coordinates)
+                    } else {
+                        Err(Box::new(ContentNotDiscovered))
+                    }
+                }
+                None => Err(Box::new(WorldNotDiscovered))
+            }
         }
 
         pub fn find_most_loaded(&self, world: &World, robot: &impl Runnable, content: Content) -> Result<MapCoordinate, Box<dyn Error>> {
@@ -110,13 +142,14 @@ pub mod tile_mapper {
                         let mut coordinates = MapCoordinate::new(0, 0);
                         if let Some(v) = vec {
 
-                            // instantiate some variables
+                            // instantiate quantity and range
                             let mut quantity: usize = 0;
                             let mut range: Range<usize> = 0..0;
                             // iterate through the vector and search for the most loaded tile
                             for content_info in v.iter() {
 
                                 // get and set coordinates of the last discovered tile with the higher amount of content
+                                // and if two tiles have the same quantity, set the closest tile
                                 match &content_info.1 {
                                     (Some(q), None) => {
                                         if q > &quantity {
@@ -124,14 +157,13 @@ pub mod tile_mapper {
                                             coordinates.set_width(content_info.0.get_width());
                                             coordinates.set_height(content_info.0.get_height());
                                         }
-                                        // if two tiles have the same quantity, set the closest tile
                                         else if q == &quantity {
                                             let width = robot.get_coordinate().get_col();
                                             let height = robot.get_coordinate().get_row();
                                             let robot_coordinates = MapCoordinate::new(width, height);
                                             let old_distance = coordinates.get_distance(&robot_coordinates);
-                                            let new_distance = content_info.clone().0.get_distance(&robot_coordinates);
-                                            if new_distance <= old_distance {
+                                            let new_distance = content_info.0.get_distance(&robot_coordinates);
+                                            if new_distance < old_distance {
                                                 quantity = q.clone();
                                                 coordinates.set_width(content_info.0.get_width());
                                                 coordinates.set_height(content_info.0.get_height());
@@ -148,8 +180,8 @@ pub mod tile_mapper {
                                             let height = robot.get_coordinate().get_row();
                                             let robot_coordinates = MapCoordinate::new(width, height);
                                             let old_distance = coordinates.get_distance(&robot_coordinates);
-                                            let new_distance = content_info.clone().0.get_distance(&robot_coordinates);
-                                            if new_distance <= old_distance {
+                                            let new_distance = content_info.0.get_distance(&robot_coordinates);
+                                            if new_distance < old_distance {
                                                 range = r.clone();
                                                 coordinates.set_width(content_info.0.get_width());
                                                 coordinates.set_height(content_info.0.get_height());
