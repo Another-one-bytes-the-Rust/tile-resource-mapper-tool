@@ -5,6 +5,7 @@ pub mod tile_mapper {
     use robotics_lib::interface::{robot_map, Tools};
     use robotics_lib::runner::{Runnable};
     use robotics_lib::utils::LibError;
+    use robotics_lib::world::coordinates::Coordinate;
     use robotics_lib::world::tile::{Content, Tile};
     use robotics_lib::world::World;
     use crate::coordinates::map_coordinate::MapCoordinate;
@@ -81,7 +82,7 @@ pub mod tile_mapper {
         fn insert_in_map(tile: &Tile, list: &mut HashMap<ToolContent, Vec<(MapCoordinate, ContentQuantity)>>, row: usize, col: usize) {
             /// This function inserts the coordinates of a `tile` and the number of elements in that `tile`
 
-            let coord = (row, col);
+            let coord = (col, row);
             let value: ContentQuantity = tile.content.get_value();
             let content = TileMapper::match_content(&tile.content);
 
@@ -117,20 +118,42 @@ pub mod tile_mapper {
 
                                 // get and set coordinates of the last discovered tile with the higher amount of content
                                 match &content_info.1 {
-                                    // TODO! if two tiles have the same quantity, return the closest
                                     (Some(q), None) => {
-                                        if q >= &quantity {
+                                        if q > &quantity {
                                             quantity = q.clone();
                                             coordinates.set_width(content_info.0.get_width());
                                             coordinates.set_height(content_info.0.get_height());
                                         }
+                                        // if two tiles have the same quantity, set the closest tile
+                                        else if q == &quantity {
+                                            let width = robot.get_coordinate().get_col();
+                                            let height = robot.get_coordinate().get_row();
+                                            let robot_coordinates = MapCoordinate::new(width, height);
+                                            let old_distance = coordinates.get_distance(&robot_coordinates);
+                                            let new_distance = content_info.clone().0.get_distance(&robot_coordinates);
+                                            if new_distance <= old_distance {
+                                                quantity = q.clone();
+                                                coordinates.set_width(content_info.0.get_width());
+                                                coordinates.set_height(content_info.0.get_height());
+                                            }
+                                        }
                                     },
                                     (None, Some(r)) => {
-                                        if r.clone().cmp(&mut range) == std::cmp::Ordering::Greater
-                                            || r.clone().cmp(&mut range) == std::cmp::Ordering::Equal {
+                                        if r.clone().len() > range.len() {
                                             range = r.clone();
                                             coordinates.set_width(content_info.0.get_width());
                                             coordinates.set_height(content_info.0.get_height());
+                                        } else if r.clone().len() == range.len() {
+                                            let width = robot.get_coordinate().get_col();
+                                            let height = robot.get_coordinate().get_row();
+                                            let robot_coordinates = MapCoordinate::new(width, height);
+                                            let old_distance = coordinates.get_distance(&robot_coordinates);
+                                            let new_distance = content_info.clone().0.get_distance(&robot_coordinates);
+                                            if new_distance <= old_distance {
+                                                range = r.clone();
+                                                coordinates.set_width(content_info.0.get_width());
+                                                coordinates.set_height(content_info.0.get_height());
+                                            }
                                         }
                                     },
                                     (_, _) => {}
@@ -166,102 +189,5 @@ pub mod tile_mapper {
                 | Content::None => ToolContent::None
             }
         }
-
-        // old version without ToolContent
-
-    // pub fn collection(world: &World) -> Option<HashMap<Content, Vec<(MapCoordinate, ContentQuantity)>>> {
-    //
-    //     // HashMap instantiation
-    //     let mut object_list: HashMap<Content, Vec<(MapCoordinate, ContentQuantity)>> = HashMap::new();
-    //
-    //     // check whether the world has been already discovered or not
-    //     match robot_map(&world) {
-    //         None => {return None;},
-    //         Some(robot_world) => {
-    //
-    //             // iterate through every tile in the world
-    //
-    //             for (row,row_vector) in robot_world.iter().enumerate() {
-    //                 for (column, element) in row_vector.iter().enumerate() {
-    //                     match element {
-    //                         None => {}
-    //                         Some(tile) => {
-    //                             // call the `insert_in_map` function defined below if content was found in the tile
-    //                             if tile.content != Content::None {
-    //                                 TileMapper::insert_in_map(tile, &mut object_list, row, column)
-    //                             }
-    //                         }
-    //                     }
-    //                 }
-    //             }
-    //         }
-    //     }
-    //     // return the HashMap
-    //     Some(object_list)
-    // }
-    //
-    // fn insert_in_map(tile: &Tile , list: &mut HashMap<Content, Vec<(MapCoordinate, ContentQuantity)>>, row: usize, col: usize) {
-    //
-    //     /// This function inserts the coordinates of a `tile` and the number of elements in that `tile`
-    //
-    //     let coord = (row, col);
-    //     let value: ContentQuantity = tile.content.get_value();
-    //     let content = tile.content.clone();
-    //
-    //     // if no tile with `content` is in the list, it creates a new entry with that keyword
-    //     // otherwise coordinates and value are added to the already existing vector
-    //     list.entry(content)
-    //         .and_modify(|v| v.push((coord.into(), value.clone())))
-    //         .or_insert(vec![(coord.into(), value)]);
-    // }
-    //
-    // pub fn find_most_loaded(&self, world: &World, robot: & impl Runnable, content: Content) -> Result<MapCoordinate, Box<dyn Error>> {
-    //     let hashmap = TileMapper::collection(world);
-    //     // check if the world has already been discovered
-    //     match hashmap {
-    //         Some(map) => {
-    //             // check if the hashmap contains the searched content
-    //             return if map.contains_key(&content) {
-    //                 let vec = map.get(&content);
-    //                 let mut coordinates = MapCoordinate::new(0,0);
-    //                 if let Some(v) = vec {
-    //
-    //                     // instantiate some variables
-    //                     let mut quantity: usize = 0;
-    //                     let mut range: Range<usize> = 0..0;
-    //                     // iterate through the vector and search for the most loaded tile
-    //                     for content_info in v.iter() {
-    //
-    //                         // get and set coordinates of the last discovered tile with the higher amount of content
-    //                         match &content_info.1 {
-    //                             // TODO! if two tiles have the same quantity, return the closest
-    //                             (Some(q), None) => {
-    //                                 if q >= &quantity {
-    //                                     quantity = q.clone();
-    //                                     coordinates.set_width(content_info.0.get_width());
-    //                                     coordinates.set_height(content_info.0.get_height());
-    //                                 }
-    //                             },
-    //                             (None, Some(r)) => {
-    //                                 if r.clone().cmp(&mut range) == std::cmp::Ordering::Greater
-    //                                     || r.clone().cmp(&mut range) == std::cmp::Ordering::Equal {
-    //                                     range = r.clone();
-    //                                     coordinates.set_width(content_info.0.get_width());
-    //                                     coordinates.set_height(content_info.0.get_height());
-    //                                 }
-    //                             },
-    //                             (_, _) => {}
-    //                         }
-    //                     }
-    //                 }
-    //                 Ok(coordinates)
-    //             } else {
-    //                 Err(Box::new(ContentNotDiscovered))
-    //             }
-    //         }
-    //         None => Err(Box::new(WorldNotDiscovered))
-    //     }
-    // }
-
     }
 }
