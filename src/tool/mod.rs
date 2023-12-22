@@ -1,5 +1,4 @@
 pub mod tile_mapper {
-
     use std::collections::HashMap;
     use std::error::Error;
     use std::ops::Range;
@@ -16,8 +15,31 @@ pub mod tile_mapper {
 
     impl Tools for TileMapper {}
 
-    type ContentQuantity = (Option<usize>, Option<Range<usize>>);
+    pub(crate) type ContentQuantity = (Option<usize>, Option<Range<usize>>);
 
+    /// `pub enum ToolContent` is basically a copy of `pub enum Content` of the library
+    /// but in this case we are not paying attention at the usize, to allow the hashmap
+    /// to store tiles with different `Contents` quantity within the same key
+
+    #[derive(Clone, Debug, Eq, Hash, PartialEq)]
+    pub enum ToolContent {
+        Rock,
+        Tree,
+        Garbage,
+        Fire,
+        Coin,
+        Bin,
+        Crate,
+        Bank,
+        Water,
+        Market,
+        Fish,
+        Building,
+        Bush,
+        JollyBlock,
+        Scarecrow,
+        None,
+    }
 
     impl TileMapper {
 
@@ -25,25 +47,27 @@ pub mod tile_mapper {
         /// It returns a `HashMap` where `key` is the element searched and `value` is a vector of tuples,
         /// The tuple stores the coordinates of a tile in another tuple, and the number of elements contained in that tile
 
-        pub fn collection(world: &World) -> Option<HashMap<Content, Vec<(MapCoordinate, ContentQuantity)>>> {
+        pub fn collection(world: &World) -> Option<HashMap<ToolContent, Vec<(MapCoordinate, ContentQuantity)>>> {
 
             // HashMap instantiation
-            let mut object_list: HashMap<Content, Vec<(MapCoordinate, ContentQuantity)>> = HashMap::new();
+            let mut object_list: HashMap<ToolContent, Vec<(MapCoordinate, ContentQuantity)>> = HashMap::new();
 
             // check whether the world has been already discovered or not
             match robot_map(&world) {
-                None => {return None;},
+                None => { return None; },
                 Some(robot_world) => {
 
                     // iterate through every tile in the world
 
-                    for (row,row_vector) in robot_world.iter().enumerate() {
+                    for (row, row_vector) in robot_world.iter().enumerate() {
                         for (column, element) in row_vector.iter().enumerate() {
                             match element {
                                 None => {}
                                 Some(tile) => {
-                                    // call the `insert_in_map` function defined below
-                                    TileMapper::insert_in_map(tile, &mut object_list, row, column)
+                                    // call the `insert_in_map` function defined below if content was found in the tile
+                                    if tile.content != Content::None {
+                                        TileMapper::insert_in_map(tile, &mut object_list, row, column)
+                                    }
                                 }
                             }
                         }
@@ -54,13 +78,12 @@ pub mod tile_mapper {
             Some(object_list)
         }
 
-        fn insert_in_map(tile: &Tile , list: &mut HashMap<Content, Vec<(MapCoordinate, ContentQuantity)>>, row: usize, col: usize) {
-
+        fn insert_in_map(tile: &Tile, list: &mut HashMap<ToolContent, Vec<(MapCoordinate, ContentQuantity)>>, row: usize, col: usize) {
             /// This function inserts the coordinates of a `tile` and the number of elements in that `tile`
 
             let coord = (row, col);
             let value: ContentQuantity = tile.content.get_value();
-            let content = tile.content.clone();
+            let content = TileMapper::match_content(&tile.content);
 
             // if no tile with `content` is in the list, it creates a new entry with that keyword
             // otherwise coordinates and value are added to the already existing vector
@@ -69,20 +92,21 @@ pub mod tile_mapper {
                 .or_insert(vec![(coord.into(), value)]);
         }
 
-        pub fn find_closest(world: &World, robot: & impl Runnable, content: Content) -> Result<MapCoordinate, LibError> {
+        pub fn find_closest(&self, world: &World, robot: &impl Runnable, content: Content) -> Result<MapCoordinate, Box<dyn Error>> {
             let hashmap = TileMapper::collection(world);
             todo!()
         }
 
-        pub fn find_most_loaded(world: &World, robot: & impl Runnable, content: Content) -> Result<MapCoordinate, Box<dyn Error>> {
+        pub fn find_most_loaded(&self, world: &World, robot: &impl Runnable, content: Content) -> Result<MapCoordinate, Box<dyn Error>> {
             let hashmap = TileMapper::collection(world);
             // check if the world has already been discovered
             match hashmap {
                 Some(map) => {
                     // check if the hashmap contains the searched content
-                    return if map.contains_key(&content) {
-                        let vec = map.get(&content);
-                        let mut coordinates = MapCoordinate::new(0,0);
+                    let cont = TileMapper::match_content(&content);
+                    return if map.contains_key(&cont) {
+                        let vec = map.get(&cont);
+                        let mut coordinates = MapCoordinate::new(0, 0);
                         if let Some(v) = vec {
 
                             // instantiate some variables
@@ -121,5 +145,123 @@ pub mod tile_mapper {
                 None => Err(Box::new(WorldNotDiscovered))
             }
         }
+
+        fn match_content(content: &Content) -> ToolContent {
+            match content {
+                | Content::Rock(_) => ToolContent::Rock,
+                | Content::Tree(_) => ToolContent::Tree,
+                | Content::Garbage(_) => ToolContent::Garbage,
+                | Content::Fire => ToolContent::Fire,
+                | Content::Coin(_) => ToolContent::Coin,
+                | Content::Bin(_) => ToolContent::Bin,
+                | Content::Crate(_) => ToolContent::Crate,
+                | Content::Bank(_) => ToolContent::Bank,
+                | Content::Water(_) => ToolContent::Water,
+                | Content::Market(_) => ToolContent::Market,
+                | Content::Fish(_) => ToolContent::Fish,
+                | Content::Building => ToolContent::Building,
+                | Content::Bush(_) => ToolContent::Bush,
+                | Content::JollyBlock(_) => ToolContent::JollyBlock,
+                | Content::Scarecrow => ToolContent::Scarecrow,
+                | Content::None => ToolContent::None
+            }
+        }
+
+        // old version without ToolContent
+
+    // pub fn collection(world: &World) -> Option<HashMap<Content, Vec<(MapCoordinate, ContentQuantity)>>> {
+    //
+    //     // HashMap instantiation
+    //     let mut object_list: HashMap<Content, Vec<(MapCoordinate, ContentQuantity)>> = HashMap::new();
+    //
+    //     // check whether the world has been already discovered or not
+    //     match robot_map(&world) {
+    //         None => {return None;},
+    //         Some(robot_world) => {
+    //
+    //             // iterate through every tile in the world
+    //
+    //             for (row,row_vector) in robot_world.iter().enumerate() {
+    //                 for (column, element) in row_vector.iter().enumerate() {
+    //                     match element {
+    //                         None => {}
+    //                         Some(tile) => {
+    //                             // call the `insert_in_map` function defined below if content was found in the tile
+    //                             if tile.content != Content::None {
+    //                                 TileMapper::insert_in_map(tile, &mut object_list, row, column)
+    //                             }
+    //                         }
+    //                     }
+    //                 }
+    //             }
+    //         }
+    //     }
+    //     // return the HashMap
+    //     Some(object_list)
+    // }
+    //
+    // fn insert_in_map(tile: &Tile , list: &mut HashMap<Content, Vec<(MapCoordinate, ContentQuantity)>>, row: usize, col: usize) {
+    //
+    //     /// This function inserts the coordinates of a `tile` and the number of elements in that `tile`
+    //
+    //     let coord = (row, col);
+    //     let value: ContentQuantity = tile.content.get_value();
+    //     let content = tile.content.clone();
+    //
+    //     // if no tile with `content` is in the list, it creates a new entry with that keyword
+    //     // otherwise coordinates and value are added to the already existing vector
+    //     list.entry(content)
+    //         .and_modify(|v| v.push((coord.into(), value.clone())))
+    //         .or_insert(vec![(coord.into(), value)]);
+    // }
+    //
+    // pub fn find_most_loaded(&self, world: &World, robot: & impl Runnable, content: Content) -> Result<MapCoordinate, Box<dyn Error>> {
+    //     let hashmap = TileMapper::collection(world);
+    //     // check if the world has already been discovered
+    //     match hashmap {
+    //         Some(map) => {
+    //             // check if the hashmap contains the searched content
+    //             return if map.contains_key(&content) {
+    //                 let vec = map.get(&content);
+    //                 let mut coordinates = MapCoordinate::new(0,0);
+    //                 if let Some(v) = vec {
+    //
+    //                     // instantiate some variables
+    //                     let mut quantity: usize = 0;
+    //                     let mut range: Range<usize> = 0..0;
+    //                     // iterate through the vector and search for the most loaded tile
+    //                     for content_info in v.iter() {
+    //
+    //                         // get and set coordinates of the last discovered tile with the higher amount of content
+    //                         match &content_info.1 {
+    //                             // TODO! if two tiles have the same quantity, return the closest
+    //                             (Some(q), None) => {
+    //                                 if q >= &quantity {
+    //                                     quantity = q.clone();
+    //                                     coordinates.set_width(content_info.0.get_width());
+    //                                     coordinates.set_height(content_info.0.get_height());
+    //                                 }
+    //                             },
+    //                             (None, Some(r)) => {
+    //                                 if r.clone().cmp(&mut range) == std::cmp::Ordering::Greater
+    //                                     || r.clone().cmp(&mut range) == std::cmp::Ordering::Equal {
+    //                                     range = r.clone();
+    //                                     coordinates.set_width(content_info.0.get_width());
+    //                                     coordinates.set_height(content_info.0.get_height());
+    //                                 }
+    //                             },
+    //                             (_, _) => {}
+    //                         }
+    //                     }
+    //                 }
+    //                 Ok(coordinates)
+    //             } else {
+    //                 Err(Box::new(ContentNotDiscovered))
+    //             }
+    //         }
+    //         None => Err(Box::new(WorldNotDiscovered))
+    //     }
+    // }
+
     }
 }
