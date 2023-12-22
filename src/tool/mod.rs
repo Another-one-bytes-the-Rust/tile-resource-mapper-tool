@@ -4,8 +4,6 @@ pub mod tile_mapper {
     use std::ops::Range;
     use robotics_lib::interface::{robot_map, Tools};
     use robotics_lib::runner::{Runnable};
-    use robotics_lib::utils::LibError;
-    use robotics_lib::world::coordinates::Coordinate;
     use robotics_lib::world::tile::{Content, Tile};
     use robotics_lib::world::World;
     use crate::coordinates::map_coordinate::MapCoordinate;
@@ -109,9 +107,11 @@ pub mod tile_mapper {
                             // iterate through the vector and search for the closest tile
                             for (index, content_info) in v.iter().enumerate() {
                                 if index == 0 {
+                                    // set first coordinates
                                     coordinates.set_width(content_info.0.get_width());
                                     coordinates.set_height(content_info.0.get_height());
                                 } else {
+                                    // search for the smallest distance between the tiles and the robot
                                     let old_distance = coordinates.get_distance(&robot_coordinates);
                                     let new_distance = content_info.0.get_distance(&robot_coordinates);
                                     if new_distance < old_distance {
