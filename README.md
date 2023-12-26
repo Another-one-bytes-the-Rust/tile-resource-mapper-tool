@@ -12,10 +12,28 @@ The Tile Resource Mapper Tool is a Rust library that creates a Hashmap with all 
 ## Usage
 
 ```rust
-use tile_resource_mapper_tool::tool::tile_resource_mapper_tool{...};
+use tile_resource_mapper_tool::tool::tile_resource_mapper_tool{ContentQuantity, TileMapper};
 
+// Create TileMapper instance
+let mut mappertool = TileMapper {};
 
+// Generate and access the HashMap
+let map = TileMapper::collection(world);
 
+// 'world' is a mutable reference to World
+// 'self' is a mutable reference to the robot 
+
+// get the closest tile with a specific content
+let closest_coordinates = mappertool.find_closest(world, self, content_to_search);
+
+// get the most loaded tile with a specific content
+let most_loaded_coordinates = mappertool.find_most_loaded(world, self, content_to_search);
+
+// the format of 'content_to_search' is:
+// Example number case:
+let content_to_search = Content::Rock(n); // where n is any random number 
+// Example range case:
+let content_to_search = Content::Bin(n..m); // where n..m is any random range 
 
 ```
 
