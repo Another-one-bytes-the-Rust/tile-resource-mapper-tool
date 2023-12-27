@@ -9,6 +9,7 @@ pub mod tile_mapper {
     use crate::coordinates::map_coordinate::MapCoordinate;
     use crate::errors::tool_errors::ToolError::{ContentNotDiscovered, WorldNotDiscovered};
     use std::mem::{Discriminant, discriminant};
+    use robotics_lib::world;
 
 
     pub struct TileMapper {}
@@ -79,29 +80,21 @@ pub mod tile_mapper {
                     let cont = discriminant(&content);
                     return if map.contains_key(&cont) {
                         let vec = map.get(&cont);
-                        let width = robot.get_coordinate().get_col();
-                        let height = robot.get_coordinate().get_row();
-                        let robot_coordinates = MapCoordinate::new(width, height);
-                        let mut coordinates = MapCoordinate::new(0, 0);
+                        let robot_coordinates = MapCoordinate::new(robot.get_coordinate().get_col(), robot.get_coordinate().get_row());
+
+                        let mut closest_coordinates = MapCoordinate::new(100000,100000);
                         if let Some(v) = vec {
                             // iterate through the vector and search for the closest tile
-                            for (index, content_info) in v.iter().enumerate() {
-                                if index == 0 {
-                                    // set first coordinates
-                                    coordinates.set_width(content_info.0.get_width());
-                                    coordinates.set_height(content_info.0.get_height());
-                                } else {
-                                    // search for the smallest distance between the tiles and the robot
-                                    let old_distance = coordinates.get_distance(&robot_coordinates);
-                                    let new_distance = content_info.0.get_distance(&robot_coordinates);
-                                    if new_distance < old_distance {
-                                        coordinates.set_width(content_info.0.get_width());
-                                        coordinates.set_height(content_info.0.get_height());
-                                    }
+                            for element in v.iter() {
+                                // search for the smallest distance between the tiles and the robot
+                                let old_distance = closest_coordinates.get_distance(&robot_coordinates);
+                                let new_distance = element.0.get_distance(&robot_coordinates);
+                                if new_distance < old_distance {
+                                    closest_coordinates = element.0;
                                 }
                             }
                         }
-                        Ok(coordinates)
+                        Ok(closest_coordinates)
                     } else {
                         Err(Box::new(ContentNotDiscovered))
                     }
