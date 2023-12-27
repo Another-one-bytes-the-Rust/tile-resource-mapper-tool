@@ -17,8 +17,12 @@ pub mod tool_errors {
     impl Display for ToolError {
         fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
             return match self {
-                ToolError::WorldNotDiscovered => write!(f,"{}","World not discovered yet".to_string()),
-                ToolError::ContentNotDiscovered => write!(f,"{}","Content not discovered yet".to_string()),
+                ToolError::WorldNotDiscovered => {
+                    write!(f, "{}", "World not discovered yet".to_string())
+                }
+                ToolError::ContentNotDiscovered => {
+                    write!(f, "{}", "Content not discovered yet".to_string())
+                }
                 ToolError::Other(message) => write!(f, "{}", message),
             };
         }
