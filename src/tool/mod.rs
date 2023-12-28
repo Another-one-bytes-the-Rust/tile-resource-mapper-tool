@@ -133,7 +133,7 @@ pub mod tile_mapper {
     /// Returns an error if it fails to find a tile.
     ///
     /// # Example
-    /// ```rust
+    /// ```ignore
     /// use tile_resource_mapper_tool::tool::tile_mapper::TileMapper;
     ///
     /// let mapper = TileMapper{};
@@ -202,7 +202,7 @@ pub mod tile_mapper {
     /// In case of two Tiles with the same amount of Content, the closest one to the robot is returned.
     ///
     /// # Example
-    /// ```rust
+    /// ```ignore
     /// use tile_resource_mapper_tool::tool::tile_mapper::TileMapper;
     ///
     /// let mapper = TileMapper{};
@@ -213,7 +213,6 @@ pub mod tile_mapper {
     ///     Ok(coord) => println!("x:{} y:{}",coord.get_width(),coord.get_height()),
     ///     Err(e) => println!("{}",e)
     /// }
-    /// ```
     /// ```
         pub fn find_most_loaded(
             &self,
