@@ -29,11 +29,36 @@ pub mod tile_mapper {
 
     
     impl TileMapper {
-        /// The `collection` function stores the number of elements found in any tile discovered by the robot
-        /// It returns a `HashMap` where `key` is the element searched and `value` is a vector of tuples,
-        /// The tuple stores the coordinates of a tile in another tuple, and the number of elements contained in that tile
+        /// The `collection` function stores the number of elements found in any tile discovered by the robot and returns them in a hashmap.
+        ///
+        /// # Arguments
+        ///
+        /// * `world` - A reference to the `World`.
+        ///
+        /// # Returns
+        ///
+        /// Returns `Some(HashMap<Discriminant<Content>, Vec<(MapCoordinate, ContentQuantity)>>)` if the world has been discovered,
+        /// the tuples store the coordinates of a tile and the number of elements contained in that tile.
+        /// Returns `None` if the robot has not discovered anything yet.
+        ///
+        /// # Notes
+        ///
         /// The usage of `mem::Discriminant<T>` allows to store in the hashmap
         /// tiles with different `Contents` quantity within the same key
+        ///
+        /// # Example
+        /// ```ignore
+        /// use tile_resource_mapper_tool::tool::tile_mapper::TileMapper;
+        ///
+        /// let mapper = TileMapper{};
+        ///
+        /// let result = mapper::collection(world);
+        ///
+        /// match result {
+        ///     Some(hashmap) => // handle hashmap,
+        ///     None => // handle case where the robot has not discovered anything yet
+        /// }
+        /// ```
     
         pub fn collection(
             world: &World,
