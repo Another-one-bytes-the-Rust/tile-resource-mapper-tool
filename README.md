@@ -40,6 +40,35 @@ let content_to_search = Content::Bin(n..m); // where n..m is any random range
 ## Examples
 
 ```rust
+// Test Tool Hashmap
+let mut expected_results: HashMap<Discriminant<Content>,Vec<(MapCoordinate, ContentQuantity)>,> = HashMap::new();
+    expected_results.insert(mem::discriminant(&Rock(12)), v_rocks);
+       let result = TileMapper::collection(world);
+                        println!("{:?}", res);
+                        assert_eq!(res, expected_results);
+// Test most loaded Tile
+let expected_result = MapCoordinate::new(3, 1);
+
+                match tool.find_most_loaded(world, self, Content::Rock(0)) {
+                    Ok(result) => {
+                        assert_eq!(result, expected_result);
+                    }
+                    Err(e) => panic!("{}", e),
+                };
+
+// Test closest Tile
+let expected_result = MapCoordinate::new(3, 1);
+
+                match tool.find_closest(world, self, Content::Rock(0)) {
+                    Ok(result) => {
+                        assert_eq!(result, expected_result);
+                    }
+                    Err(e) => panic!("{}", e),
+                };
+            }
+
+
+
 
 ```
 
