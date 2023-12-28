@@ -131,6 +131,20 @@ pub mod tile_mapper {
     ///
     /// Returns the Map coordinates of the closest Tile containing the requested Content.
     /// Returns an error if it fails to find a tile.
+    ///
+    /// # Example
+    /// ```rust
+    /// use tile_resource_mapper_tool::tool::tile_mapper::TileMapper;
+    ///
+    /// let mapper = TileMapper{};
+    ///
+    /// let result = mapper.find_closest(world, robot, content);
+    ///
+    /// match result {
+    ///     Ok(coord) => println!("x:{} y:{}",coord.get_width(),coord.get_height()),
+    ///     Err(e) => println!("{}",e)
+    /// }
+    /// ```
         
         pub fn find_closest(
             &self,
@@ -187,7 +201,20 @@ pub mod tile_mapper {
     ///    
     /// In case of two Tiles with the same amount of Content, the closest one to the robot is returned.
     ///
-
+    /// # Example
+    /// ```rust
+    /// use tile_resource_mapper_tool::tool::tile_mapper::TileMapper;
+    ///
+    /// let mapper = TileMapper{};
+    ///
+    /// let result = mapper.find_most_loaded(world, robot, content);
+    ///
+    /// match result {
+    ///     Ok(coord) => println!("x:{} y:{}",coord.get_width(),coord.get_height()),
+    ///     Err(e) => println!("{}",e)
+    /// }
+    /// ```
+    /// ```
         pub fn find_most_loaded(
             &self,
             world: &World,
