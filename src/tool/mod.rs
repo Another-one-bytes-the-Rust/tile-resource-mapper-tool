@@ -119,19 +119,18 @@ pub mod tile_mapper {
         }
 
 
-    /// Find the closest Tile to the Robot at that time, having a certain Content
+    /// Finds the closest Tile to the Robot at that time, containing a certain Content.
     ///
-    /// #Arguments
+    /// # Arguments
     ///
-    /// *A reference to self
-    /// *A reference to the World in which the coordinates are computed
-    /// *A reference to an object implementing the "Runnable" trait
-    /// *The Content we are looking for
+    /// * `world` - A reference to the World in which the coordinates are computed.
+    /// * `robot` - A reference to an object implementing the "Runnable" trait.
+    /// * `content` - The Content we are looking for.
     ///
-    /// #Returns
+    /// # Returns
     ///
-    /// *Returns the Map coordinates of that Tile
-    /// *Returns an error if it fails to find that Tile
+    /// Returns the Map coordinates of the closest Tile containing the requested Content.
+    /// Returns an error if it fails to find a tile.
         
         pub fn find_closest(
             &self,
@@ -172,23 +171,22 @@ pub mod tile_mapper {
                 None => Err(Box::new(WorldNotDiscovered)),
             }
         }
-    /// Find the most loaded Tile, given a type of Content
+    /// Find the most loaded Tile, given a type of Content.
     ///
-    /// #Arguments
+    /// # Arguments
     ///
-    /// *A reference to self
-    /// *A reference to the World in which the coordinates are computed
-    /// *A reference to an object implementing the "Runnable" trait
-    /// *The Content we want
+    /// * `world` - A reference to the World in which the coordinates are computed.
+    /// * `robot` - A reference to an object implementing the "Runnable" trait.
+    /// * `content` - The Content we're searching for.
     ///
-    /// #Returns
+    /// # Returns
     ///
-    /// *Returns the Map coordinates of that Tile
-    /// *Returns an error if it fails to find that Tile
+    /// Returns the Map coordinates of the tile having the most Content. If no tile is found an error is returned.
     ///
-    /// #Notes
+    /// # Notes
     ///    
-    /// *in case of two Tiles with the same amount of Content, the closest one to the robot is given
+    /// In case of two Tiles with the same amount of Content, the closest one to the robot is returned.
+    ///
 
         pub fn find_most_loaded(
             &self,
