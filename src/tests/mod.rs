@@ -89,10 +89,10 @@ mod tests {
         let c3 = MapCoordinate::new(4, 0);
         let c4 = MapCoordinate::new(3, 1);
         let distance = c3.get_distance(&c4);
-        assert_eq!(distance, 3.1622776601683795);
+        assert_eq!(distance, std::f64::consts::SQRT_2);
     }
     #[test]
-    fn test_tool_hashmap_discriminant() {
+    fn test_tool_hashmap() {
         struct TestRobot(Robot);
         impl Runnable for TestRobot {
             fn process_tick(&mut self, world: &mut World) {
@@ -252,166 +252,6 @@ mod tests {
         );
         let _ = runner.unwrap().game_tick();
     }
-
-    // #[test]
-    // fn test_tool_hashmap() {
-    //     struct TestRobot(Robot);
-    //     impl Runnable for TestRobot {
-    //         fn process_tick(&mut self, world: &mut World) {
-    //             let tool = TileMapper {};
-    //             // path the robot must follow
-    //             let directions = [
-    //                 Direction::Right,
-    //                 Direction::Down,
-    //                 Direction::Right,
-    //                 Direction::Down,
-    //                 Direction::Up,
-    //                 Direction::Right,
-    //                 Direction::Up,
-    //                 Direction::Right,
-    //             ];
-    //
-    //             //move the robot
-    //             for (phase, dir) in directions.iter().enumerate() {
-    //                 go(self, world, dir.to_owned()).expect("");
-    //             }
-    //
-    //             // expected results from the tool
-    //             let mut expected_results: HashMap<ToolContent, Vec<(MapCoordinate, ContentQuantity)>> = HashMap::new();
-    //
-    //             let coord_2_2 = MapCoordinate::new(2,2);
-    //             let coord_1_3 = MapCoordinate::new(3,1);
-    //             let mut v_rocks = vec![];
-    //             v_rocks.push((coord_1_3, (Some(17), None)));
-    //             v_rocks.push((coord_2_2, (Some(2), None)));
-    //             expected_results.insert(ToolContent::Rock, v_rocks);
-    //
-    //             let coord_1_2 = MapCoordinate::new(2,1);
-    //             let mut v_coins = vec![];
-    //             v_coins.push((coord_1_2, (Some(3), None)));
-    //             expected_results.insert(ToolContent::Coin, v_coins);
-    //
-    //             let coord_1_1 = MapCoordinate::new(1,1);
-    //             let mut v_bin = vec![];
-    //             v_bin.push((coord_1_1, (None, Some(0..4))));
-    //             expected_results.insert(ToolContent::Bin, v_bin);
-    //
-    //             let result = TileMapper::collection(world);
-    //             match result {
-    //                 Some(res) => {
-    //                     println!("{:?}", res);
-    //
-    //                     assert_eq!(res, expected_results);
-    //                     // assert_eq!(res.len(), 1);
-    //                 },
-    //                 None =>  panic!("error while matching the hashmap")
-    //             }
-    //         }
-    //         fn handle_event(&mut self, event: Event) {
-    //             println!();
-    //             println!("{:?}", event);
-    //             println!();
-    //         }
-    //         fn get_energy(&self) -> &Energy {
-    //             &self.0.energy
-    //         }
-    //         fn get_energy_mut(&mut self) -> &mut Energy {
-    //             &mut self.0.energy
-    //         }
-    //         fn get_coordinate(&self) -> &Coordinate {
-    //             &self.0.coordinate
-    //         }
-    //         fn get_coordinate_mut(&mut self) -> &mut Coordinate {
-    //             &mut self.0.coordinate
-    //         }
-    //         fn get_backpack(&self) -> &BackPack {
-    //             &self.0.backpack
-    //         }
-    //         fn get_backpack_mut(&mut self) -> &mut BackPack {
-    //             &mut self.0.backpack
-    //         }
-    //     }
-    //
-    //     struct WorldGenerator {
-    //         size: usize,
-    //         spawn_x: usize,
-    //         spawn_y: usize,
-    //         tile_type: TileType,
-    //     }
-    //
-    //     impl WorldGenerator {
-    //         fn new(size: usize, spawn_x: usize, spawn_y: usize, tile_type: TileType) -> Self {
-    //             Self {
-    //                 size,
-    //                 spawn_x,
-    //                 spawn_y,
-    //                 tile_type,
-    //             }
-    //         }
-    //     }
-    //
-    //     impl Generator for WorldGenerator {
-    //         fn gen(&mut self) -> WorldType {
-    //             let mut map: Vec<Vec<Tile>> = Vec::new();
-    //             // Initialize the map with default tiles
-    //             for _ in 0..self.size {
-    //                 let mut row: Vec<Tile> = Vec::new();
-    //                 for _ in 0..self.size {
-    //                     let tile = Tile {
-    //                         tile_type: self.tile_type,
-    //                         content: Content::None,
-    //                         elevation: 0,
-    //                     };
-    //                     row.push(tile);
-    //                 }
-    //                 map.push(row);
-    //             }
-    //             // add rocks in (2,2)
-    //             map[2][2] = Tile {
-    //                 tile_type: self.tile_type,
-    //                 content: Content::Rock(2),
-    //                 elevation: 0,
-    //             };
-    //             // add rocks in (1,3)
-    //             map[1][3] = Tile {
-    //                 tile_type: self.tile_type,
-    //                 content: Content::Rock(17),
-    //                 elevation: 0,
-    //             };
-    //             // add coins in (1,2)
-    //             map[1][2] = Tile {
-    //                 tile_type: self.tile_type,
-    //                 content: Content::Coin(3),
-    //                 elevation: 0,
-    //             };
-    //             // add Bin in (1,1)
-    //             map[1][1] = Tile {
-    //                 tile_type: self.tile_type,
-    //                 content: Content::Bin(0..4),
-    //                 elevation: 0,
-    //             };
-    //
-    //
-    //             let environmental_conditions =
-    //                 EnvironmentalConditions::new(&vec![Sunny], 15, 12).unwrap();
-    //             // implementation
-    //             return (
-    //                 map,
-    //                 (self.spawn_x, self.spawn_y),
-    //                 environmental_conditions,
-    //                 10.0,
-    //                 None,
-    //             );
-    //         }
-    //     }
-    //
-    //     let r = TestRobot(Robot::new());
-    //     let runner = Runner::new(
-    //         Box::new(r),
-    //         &mut WorldGenerator::new(5, 0, 0, TileType::Grass),
-    //     );
-    //     let _ = runner.unwrap().game_tick();
-    // }
 
     #[test]
     fn test_find_most_loaded_usize() {
