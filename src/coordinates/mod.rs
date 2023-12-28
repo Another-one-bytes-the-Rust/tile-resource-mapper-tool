@@ -107,7 +107,9 @@ pub mod map_coordinate {
         }
 
         pub fn get_distance(&self, other: &MapCoordinate) -> f64 {
-            ((self.width as f64 - other.width as f64).powf(2.) + (self.height as f64 - other.height as f64).powf(2.)).sqrt()
+            ((self.width as f64 - other.width as f64).powf(2.)
+                + (self.height as f64 - other.height as f64).powf(2.))
+            .sqrt()
         }
     }
 

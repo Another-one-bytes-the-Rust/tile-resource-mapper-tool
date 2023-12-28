@@ -1,8 +1,5 @@
 #[cfg(test)]
 mod tests {
-    use std::collections::HashMap;
-    use std::mem;
-    use std::mem::Discriminant;
     use crate::coordinates::map_coordinate::MapCoordinate;
     use crate::tool::tile_mapper::{ContentQuantity, TileMapper};
     use robotics_lib::energy::Energy;
@@ -13,12 +10,14 @@ mod tests {
     use robotics_lib::world::coordinates::Coordinate;
     use robotics_lib::world::environmental_conditions::EnvironmentalConditions;
     use robotics_lib::world::environmental_conditions::WeatherType::Sunny;
-    use robotics_lib::world::tile::{Content, Tile, TileType};
     use robotics_lib::world::tile::Content::{Bin, Coin, Rock};
+    use robotics_lib::world::tile::{Content, Tile, TileType};
     use robotics_lib::world::world_generator::Generator;
     use robotics_lib::world::world_generator::World as WorldType;
     use robotics_lib::world::World;
-
+    use std::collections::HashMap;
+    use std::mem;
+    use std::mem::Discriminant;
 
     #[test]
     fn test_new_map_coordinate() {
@@ -80,15 +79,15 @@ mod tests {
 
     #[test]
     fn test_get_distance() {
-        let c1 = MapCoordinate::new(4,0);
-        let c2 = MapCoordinate::new(1,1);
+        let c1 = MapCoordinate::new(4, 0);
+        let c2 = MapCoordinate::new(1, 1);
         let distance = c1.get_distance(&c2);
         let same_distance = c2.get_distance(&c1);
         assert_eq!(distance, 3.1622776601683795);
         assert_eq!(distance, same_distance);
 
-        let c3 = MapCoordinate::new(4,0);
-        let c4 = MapCoordinate::new(3,1);
+        let c3 = MapCoordinate::new(4, 0);
+        let c4 = MapCoordinate::new(3, 1);
         let distance = c3.get_distance(&c4);
         assert_eq!(distance, 3.1622776601683795);
     }
@@ -97,7 +96,7 @@ mod tests {
         struct TestRobot(Robot);
         impl Runnable for TestRobot {
             fn process_tick(&mut self, world: &mut World) {
-                let tool = TileMapper {};
+                let _tool = TileMapper {};
                 // path the robot must follow
                 let directions = [
                     Direction::Right,
@@ -111,26 +110,29 @@ mod tests {
                 ];
 
                 //move the robot
-                for (phase, dir) in directions.iter().enumerate() {
+                for (_phase, dir) in directions.iter().enumerate() {
                     go(self, world, dir.to_owned()).expect("");
                 }
 
                 // expected results from the tool
-                let mut expected_results: HashMap<Discriminant<Content>, Vec<(MapCoordinate, ContentQuantity)>> = HashMap::new();
+                let mut expected_results: HashMap<
+                    Discriminant<Content>,
+                    Vec<(MapCoordinate, ContentQuantity)>,
+                > = HashMap::new();
 
-                let coord_2_2 = MapCoordinate::new(2,2);
-                let coord_1_3 = MapCoordinate::new(3,1);
+                let coord_2_2 = MapCoordinate::new(2, 2);
+                let coord_1_3 = MapCoordinate::new(3, 1);
                 let mut v_rocks = vec![];
                 v_rocks.push((coord_1_3, (Some(17), None)));
                 v_rocks.push((coord_2_2, (Some(2), None)));
                 expected_results.insert(mem::discriminant(&Rock(12)), v_rocks);
 
-                let coord_1_2 = MapCoordinate::new(2,1);
+                let coord_1_2 = MapCoordinate::new(2, 1);
                 let mut v_coins = vec![];
                 v_coins.push((coord_1_2, (Some(3), None)));
                 expected_results.insert(mem::discriminant(&Coin(20)), v_coins);
 
-                let coord_1_1 = MapCoordinate::new(1,1);
+                let coord_1_1 = MapCoordinate::new(1, 1);
                 let mut v_bin = vec![];
                 v_bin.push((coord_1_1, (None, Some(0..4))));
                 expected_results.insert(mem::discriminant(&Bin(0..2)), v_bin);
@@ -142,8 +144,8 @@ mod tests {
 
                         assert_eq!(res, expected_results);
                         // assert_eq!(res.len(), 1);
-                    },
-                    None =>  panic!("error while matching the hashmap")
+                    }
+                    None => panic!("error while matching the hashmap"),
                 }
             }
             fn handle_event(&mut self, event: Event) {
@@ -230,7 +232,6 @@ mod tests {
                     elevation: 0,
                 };
 
-
                 let environmental_conditions =
                     EnvironmentalConditions::new(&vec![Sunny], 15, 12).unwrap();
                 // implementation
@@ -251,7 +252,6 @@ mod tests {
         );
         let _ = runner.unwrap().game_tick();
     }
-
 
     // #[test]
     // fn test_tool_hashmap() {
@@ -432,19 +432,18 @@ mod tests {
                 ];
 
                 //move the robot
-                for (phase, dir) in directions.iter().enumerate() {
+                for (_phase, dir) in directions.iter().enumerate() {
                     go(self, world, dir.to_owned()).expect("");
                 }
 
-                let expected_result = MapCoordinate::new(3,1);
+                let expected_result = MapCoordinate::new(3, 1);
 
                 match tool.find_most_loaded(world, self, Content::Rock(0)) {
                     Ok(result) => {
                         assert_eq!(result, expected_result);
                     }
-                    Err(e) => panic!("{}", e)
+                    Err(e) => panic!("{}", e),
                 };
-
             }
             fn handle_event(&mut self, event: Event) {
                 println!();
@@ -520,7 +519,7 @@ mod tests {
                     tile_type: self.tile_type,
                     content: Content::Rock(5),
                     elevation: 0,
-                    };
+                };
                 map[1][1] = Tile {
                     tile_type: self.tile_type,
                     content: Content::Rock(9),
@@ -531,7 +530,6 @@ mod tests {
                     content: Content::Coin(1),
                     elevation: 0,
                 };
-
 
                 let environmental_conditions =
                     EnvironmentalConditions::new(&vec![Sunny], 15, 12).unwrap();
@@ -573,17 +571,17 @@ mod tests {
                 ];
 
                 //move the robot
-                for (phase, dir) in directions.iter().enumerate() {
+                for (_phase, dir) in directions.iter().enumerate() {
                     go(self, world, dir.to_owned()).expect("");
                 }
 
-                let expected_result = MapCoordinate::new(3,1);
+                let expected_result = MapCoordinate::new(3, 1);
 
                 match tool.find_most_loaded(world, self, Content::Bin(0..0)) {
                     Ok(result) => {
                         assert_eq!(result, expected_result);
                     }
-                    Err(e) => panic!("{}", e)
+                    Err(e) => panic!("{}", e),
                 };
             }
             fn handle_event(&mut self, event: Event) {
@@ -672,7 +670,6 @@ mod tests {
                     elevation: 0,
                 };
 
-
                 let environmental_conditions =
                     EnvironmentalConditions::new(&vec![Sunny], 15, 12).unwrap();
                 // implementation
@@ -713,19 +710,18 @@ mod tests {
                 ];
 
                 //move the robot
-                for (phase, dir) in directions.iter().enumerate() {
+                for (_phase, dir) in directions.iter().enumerate() {
                     go(self, world, dir.to_owned()).expect("");
                 }
 
-                let expected_result = MapCoordinate::new(3,1);
+                let expected_result = MapCoordinate::new(3, 1);
 
                 match tool.find_most_loaded(world, self, Content::Bin(0..0)) {
                     Ok(result) => {
                         assert_eq!(result, expected_result);
                     }
-                    Err(e) => panic!("{}", e)
+                    Err(e) => panic!("{}", e),
                 };
-
             }
             fn handle_event(&mut self, event: Event) {
                 println!();
@@ -812,7 +808,6 @@ mod tests {
                     content: Content::Coin(1),
                     elevation: 0,
                 };
-
 
                 let environmental_conditions =
                     EnvironmentalConditions::new(&vec![Sunny], 15, 12).unwrap();
@@ -854,19 +849,18 @@ mod tests {
                 ];
 
                 //move the robot
-                for (phase, dir) in directions.iter().enumerate() {
+                for (_phase, dir) in directions.iter().enumerate() {
                     go(self, world, dir.to_owned()).expect("");
                 }
 
-                let expected_result = MapCoordinate::new(3,1);
+                let expected_result = MapCoordinate::new(3, 1);
 
                 match tool.find_most_loaded(world, self, Content::Rock(0)) {
                     Ok(result) => {
                         assert_eq!(result, expected_result);
                     }
-                    Err(e) => panic!("{}", e)
+                    Err(e) => panic!("{}", e),
                 };
-
             }
             fn handle_event(&mut self, event: Event) {
                 println!();
@@ -954,7 +948,6 @@ mod tests {
                     elevation: 0,
                 };
 
-
                 let environmental_conditions =
                     EnvironmentalConditions::new(&vec![Sunny], 15, 12).unwrap();
                 // implementation
@@ -995,18 +988,17 @@ mod tests {
                 ];
 
                 //move the robot
-                for (phase, dir) in directions.iter().enumerate() {
+                for (_phase, dir) in directions.iter().enumerate() {
                     go(self, world, dir.to_owned()).expect("");
                 }
 
                 let expected_error = "Content not discovered yet".to_string();
 
                 match tool.find_most_loaded(world, self, Content::Bush(0)) {
-                    Ok(result) => {},
+                    Ok(_result) => {}
                     // Err(e) => panic!("{}", e)
                     Err(e) => assert_eq!(e.to_string(), expected_error),
                 };
-
             }
             fn handle_event(&mut self, event: Event) {
                 println!();
@@ -1094,7 +1086,6 @@ mod tests {
                     elevation: 0,
                 };
 
-
                 let environmental_conditions =
                     EnvironmentalConditions::new(&vec![Sunny], 15, 12).unwrap();
                 // implementation
@@ -1116,7 +1107,6 @@ mod tests {
         let _ = runner.unwrap().game_tick();
     }
 
-
     #[test]
     fn test_find_closest() {
         struct TestRobot(Robot);
@@ -1136,19 +1126,18 @@ mod tests {
                 ];
 
                 //move the robot
-                for (phase, dir) in directions.iter().enumerate() {
+                for (_phase, dir) in directions.iter().enumerate() {
                     go(self, world, dir.to_owned()).expect("");
                 }
 
-                let expected_result = MapCoordinate::new(3,1);
+                let expected_result = MapCoordinate::new(3, 1);
 
                 match tool.find_closest(world, self, Content::Rock(0)) {
                     Ok(result) => {
                         assert_eq!(result, expected_result);
                     }
-                    Err(e) => panic!("{}", e)
+                    Err(e) => panic!("{}", e),
                 };
-
             }
             fn handle_event(&mut self, event: Event) {
                 println!();
@@ -1236,7 +1225,6 @@ mod tests {
                     elevation: 0,
                 };
 
-
                 let environmental_conditions =
                     EnvironmentalConditions::new(&vec![Sunny], 15, 12).unwrap();
                 // implementation
@@ -1277,19 +1265,18 @@ mod tests {
                 ];
 
                 //move the robot
-                for (phase, dir) in directions.iter().enumerate() {
+                for (_phase, dir) in directions.iter().enumerate() {
                     go(self, world, dir.to_owned()).expect("");
                 }
 
-                let expected_result = MapCoordinate::new(3,1);
+                let expected_result = MapCoordinate::new(3, 1);
 
                 match tool.find_closest(world, self, Content::Bin(0..0)) {
                     Ok(result) => {
                         assert_eq!(result, expected_result);
                     }
-                    Err(e) => panic!("{}", e)
+                    Err(e) => panic!("{}", e),
                 };
-
             }
             fn handle_event(&mut self, event: Event) {
                 println!();
@@ -1376,7 +1363,6 @@ mod tests {
                     content: Content::Coin(1),
                     elevation: 0,
                 };
-
 
                 let environmental_conditions =
                     EnvironmentalConditions::new(&vec![Sunny], 15, 12).unwrap();
