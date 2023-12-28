@@ -17,13 +17,24 @@ pub mod tile_mapper {
 
     pub(crate) type ContentQuantity = (Option<usize>, Option<Range<usize>>);
 
+    /// Create and return a HashMap with the "element" as a key value, a vector of tuples for his coordinates and the number of Content on every Tile
+    ///
+    /// #Arguments
+    ///
+    /// *A reference to the World in which the coordinates are computed
+    /// 
+    /// #Returns
+    ///
+    /// *Returns an "Option<HashMap<Discriminant<Content>, Vec<(MapCoordinate, ContentQuantity)>>" representing the content, the vector of coordinates and the quantity of content
+
+    
     impl TileMapper {
         /// The `collection` function stores the number of elements found in any tile discovered by the robot
         /// It returns a `HashMap` where `key` is the element searched and `value` is a vector of tuples,
         /// The tuple stores the coordinates of a tile in another tuple, and the number of elements contained in that tile
         /// The usage of `mem::Discriminant<T>` allows to store in the hashmap
         /// tiles with different `Contents` quantity within the same key
-
+    
         pub fn collection(
             world: &World,
         ) -> Option<HashMap<Discriminant<Content>, Vec<(MapCoordinate, ContentQuantity)>>> {
@@ -82,6 +93,21 @@ pub mod tile_mapper {
                 .or_insert(vec![(coord.into(), value)]);
         }
 
+
+    /// Find the closest Tile to the Robot at that time, having a certain Content
+    ///
+    /// #Arguments
+    ///
+    /// *A reference to self
+    /// *A reference to the World in which the coordinates are computed
+    /// *A reference to an object implementing the "Runnable" trait
+    /// *The Content we are looking for
+    ///
+    /// #Returns
+    ///
+    /// *Returns the Map coordinates of that Tile
+    /// *Returns an error if it fails to find that Tile
+        
         pub fn find_closest(
             &self,
             world: &World,
@@ -121,6 +147,23 @@ pub mod tile_mapper {
                 None => Err(Box::new(WorldNotDiscovered)),
             }
         }
+    /// Find the most loaded Tile, given a type of Content
+    ///
+    /// #Arguments
+    ///
+    /// *A reference to self
+    /// *A reference to the World in which the coordinates are computed
+    /// *A reference to an object implementing the "Runnable" trait
+    /// *The Content we want
+    ///
+    /// #Returns
+    ///
+    /// *Returns the Map coordinates of that Tile
+    /// *Returns an error if it fails to find that Tile
+    ///
+    /// #Notes
+    ///    
+    /// *in case of two Tiles with the same amount of Content, the closest one to the robot is given
 
         pub fn find_most_loaded(
             &self,
