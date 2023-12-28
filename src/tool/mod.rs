@@ -17,17 +17,6 @@ pub mod tile_mapper {
 
     pub(crate) type ContentQuantity = (Option<usize>, Option<Range<usize>>);
 
-    /// Create and return a HashMap with the "element" as a key value, a vector of tuples for his coordinates and the number of Content on every Tile
-    ///
-    /// #Arguments
-    ///
-    /// *A reference to the World in which the coordinates are computed
-    /// 
-    /// #Returns
-    ///
-    /// *Returns an "Option<HashMap<Discriminant<Content>, Vec<(MapCoordinate, ContentQuantity)>>" representing the content, the vector of coordinates and the quantity of content
-
-    
     impl TileMapper {
         /// The `collection` function stores the number of elements found in any tile discovered by the robot and returns them in a hashmap.
         ///
@@ -59,7 +48,7 @@ pub mod tile_mapper {
         ///     None => // handle case where the robot has not discovered anything yet
         /// }
         /// ```
-    
+
         pub fn collection(
             world: &World,
         ) -> Option<HashMap<Discriminant<Content>, Vec<(MapCoordinate, ContentQuantity)>>> {
@@ -118,34 +107,33 @@ pub mod tile_mapper {
                 .or_insert(vec![(coord.into(), value)]);
         }
 
+        /// Finds the closest Tile to the Robot at that time, containing a certain Content.
+        ///
+        /// # Arguments
+        ///
+        /// * `world` - A reference to the World in which the coordinates are computed.
+        /// * `robot` - A reference to an object implementing the "Runnable" trait.
+        /// * `content` - The Content we are looking for.
+        ///
+        /// # Returns
+        ///
+        /// Returns the Map coordinates of the closest Tile containing the requested Content.
+        /// Returns an error if it fails to find a tile.
+        ///
+        /// # Example
+        /// ```ignore
+        /// use tile_resource_mapper_tool::tool::tile_mapper::TileMapper;
+        ///
+        /// let mapper = TileMapper{};
+        ///
+        /// let result = mapper.find_closest(world, robot, content);
+        ///
+        /// match result {
+        ///     Ok(coord) => println!("x:{} y:{}",coord.get_width(),coord.get_height()),
+        ///     Err(e) => println!("{}",e)
+        /// }
+        /// ```
 
-    /// Finds the closest Tile to the Robot at that time, containing a certain Content.
-    ///
-    /// # Arguments
-    ///
-    /// * `world` - A reference to the World in which the coordinates are computed.
-    /// * `robot` - A reference to an object implementing the "Runnable" trait.
-    /// * `content` - The Content we are looking for.
-    ///
-    /// # Returns
-    ///
-    /// Returns the Map coordinates of the closest Tile containing the requested Content.
-    /// Returns an error if it fails to find a tile.
-    ///
-    /// # Example
-    /// ```ignore
-    /// use tile_resource_mapper_tool::tool::tile_mapper::TileMapper;
-    ///
-    /// let mapper = TileMapper{};
-    ///
-    /// let result = mapper.find_closest(world, robot, content);
-    ///
-    /// match result {
-    ///     Ok(coord) => println!("x:{} y:{}",coord.get_width(),coord.get_height()),
-    ///     Err(e) => println!("{}",e)
-    /// }
-    /// ```
-        
         pub fn find_closest(
             &self,
             world: &World,
@@ -185,35 +173,35 @@ pub mod tile_mapper {
                 None => Err(Box::new(WorldNotDiscovered)),
             }
         }
-    /// Find the most loaded Tile, given a type of Content.
-    ///
-    /// # Arguments
-    ///
-    /// * `world` - A reference to the World in which the coordinates are computed.
-    /// * `robot` - A reference to an object implementing the "Runnable" trait.
-    /// * `content` - The Content we're searching for.
-    ///
-    /// # Returns
-    ///
-    /// Returns the Map coordinates of the tile having the most Content. If no tile is found an error is returned.
-    ///
-    /// # Notes
-    ///    
-    /// In case of two Tiles with the same amount of Content, the closest one to the robot is returned.
-    ///
-    /// # Example
-    /// ```ignore
-    /// use tile_resource_mapper_tool::tool::tile_mapper::TileMapper;
-    ///
-    /// let mapper = TileMapper{};
-    ///
-    /// let result = mapper.find_most_loaded(world, robot, content);
-    ///
-    /// match result {
-    ///     Ok(coord) => println!("x:{} y:{}",coord.get_width(),coord.get_height()),
-    ///     Err(e) => println!("{}",e)
-    /// }
-    /// ```
+        /// Find the most loaded Tile, given a type of Content.
+        ///
+        /// # Arguments
+        ///
+        /// * `world` - A reference to the World in which the coordinates are computed.
+        /// * `robot` - A reference to an object implementing the "Runnable" trait.
+        /// * `content` - The Content we're searching for.
+        ///
+        /// # Returns
+        ///
+        /// Returns the Map coordinates of the tile having the most Content. If no tile is found an error is returned.
+        ///
+        /// # Notes
+        ///    
+        /// In case of two Tiles with the same amount of Content, the closest one to the robot is returned.
+        ///
+        /// # Example
+        /// ```ignore
+        /// use tile_resource_mapper_tool::tool::tile_mapper::TileMapper;
+        ///
+        /// let mapper = TileMapper{};
+        ///
+        /// let result = mapper.find_most_loaded(world, robot, content);
+        ///
+        /// match result {
+        ///     Ok(coord) => println!("x:{} y:{}",coord.get_width(),coord.get_height()),
+        ///     Err(e) => println!("{}",e)
+        /// }
+        /// ```
         pub fn find_most_loaded(
             &self,
             world: &World,
