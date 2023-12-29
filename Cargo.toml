@@ -1,10 +1,18 @@
 [package]
 authors = ["Another one bytes the Rust"]
 name = "tile-resource-mapper-tool"
-version = "0.1.0"
+version = "1.0.0"
 edition = "2021"
+description = "The Tile Resource Mapper Tool is a Rust library that creates a Hashmap with all the Contents discovered by the robot, including their quantity and coordinates."
+documentation = ""
+readme = "README.md"
+repository = "https://github.com/Another-one-bytes-the-Rust/tile-resource-mapper-tool"
+exclude = ["/.idea"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[lib]
+name = "another_one_bytes_the_dust_tile_resource_mapper_tool"
+path = "src/lib.rs"
 
 [dependencies]
 robotics_lib = {version = "0.1.21", registry = "kellnr"}
