@@ -245,7 +245,6 @@ pub mod tile_mapper {
                 None => Err(Box::new(WorldNotDiscovered)),
             }
         }
-
         /// Find the most loaded Tile, given a type of Content.
         ///
         /// # Arguments
