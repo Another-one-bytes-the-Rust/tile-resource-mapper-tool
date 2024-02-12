@@ -1,15 +1,16 @@
 pub mod tile_mapper {
-    use crate::coordinates::map_coordinate::MapCoordinate;
-    use crate::errors::tool_errors::ToolError::{ContentNotDiscovered, WorldNotDiscovered};
-    use robotics_lib::interface::{robot_map, Tools};
-    use robotics_lib::runner::Runnable;
-
-    use robotics_lib::world::tile::{Content, Tile};
-    use robotics_lib::world::World;
     use std::collections::HashMap;
     use std::error::Error;
     use std::mem::{discriminant, Discriminant};
     use std::ops::Range;
+
+    use robotics_lib::interface::{robot_map, Tools};
+    use robotics_lib::runner::Runnable;
+    use robotics_lib::world::tile::{Content, Tile};
+    use robotics_lib::world::World;
+
+    use crate::coordinates::map_coordinate::MapCoordinate;
+    use crate::errors::tool_errors::ToolError::{ContentNotDiscovered, WorldNotDiscovered};
 
     pub struct TileMapper {}
 
@@ -114,7 +115,7 @@ pub mod tile_mapper {
             let mut object_list: HashMap<
                 Discriminant<Content>,
                 Vec<(MapCoordinate, ContentQuantity)>,
-            > = HashMap::new(),
+            > = HashMap::new();
 
             for (row, row_vector) in robot_world.iter().enumerate() {
                 for (column, element) in row_vector.iter().enumerate() {
