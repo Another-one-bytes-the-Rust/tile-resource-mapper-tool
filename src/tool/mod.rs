@@ -275,7 +275,6 @@ pub mod tile_mapper {
         ///     Err(e) => println!("{}",e)
         /// }
         /// ```
-        ///
         pub fn find_most_loaded(
             &self,
             world: &World,
