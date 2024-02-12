@@ -107,6 +107,37 @@ pub mod tile_mapper {
                 .or_insert(vec![(coord.into(), value)]);
         }
 
+        fn collection2(
+            robot_world: Vec<Vec<Option<Tile>>>,
+        ) -> Option<HashMap<Discriminant<Content>, Vec<(MapCoordinate, ContentQuantity)>>> {
+            // HashMap instantiation
+            let mut object_list: HashMap<
+                Discriminant<Content>,
+                Vec<(MapCoordinate, ContentQuantity)>,
+            > = HashMap::new(),
+
+            for (row, row_vector) in robot_world.iter().enumerate() {
+                for (column, element) in row_vector.iter().enumerate() {
+                    match element {
+                        None => {}
+                        Some(tile) => {
+                            // call the `insert_in_map` function defined below if content was found in the tile
+                            if tile.content != Content::None {
+                                TileMapper::insert_in_map(
+                                    tile,
+                                    &mut object_list,
+                                    row,
+                                    column,
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+            // return the HashMap
+            Some(object_list)
+        }
+
         /// Finds the closest Tile to the Robot at that time, containing a certain Content.
         ///
         /// # Arguments
@@ -141,6 +172,47 @@ pub mod tile_mapper {
             content: Content,
         ) -> Result<MapCoordinate, Box<dyn Error>> {
             let hashmap = TileMapper::collection(world);
+            match hashmap {
+                Some(map) => {
+                    // check if the hashmap contains the searched content
+                    let cont = discriminant(&content);
+                    return if map.contains_key(&cont) {
+                        let vec = map.get(&cont);
+                        let robot_coordinates = MapCoordinate::new(
+                            robot.get_coordinate().get_col(),
+                            robot.get_coordinate().get_row(),
+                        );
+
+                        let mut closest_coordinates = MapCoordinate::new(100000, 100000);
+                        if let Some(v) = vec {
+                            // iterate through the vector and search for the closest tile
+                            for element in v.iter() {
+                                // search for the smallest distance between the tiles and the robot
+                                let old_distance =
+                                    closest_coordinates.get_distance(&robot_coordinates);
+                                let new_distance = element.0.get_distance(&robot_coordinates);
+                                if new_distance < old_distance {
+                                    closest_coordinates = element.0;
+                                }
+                            }
+                        }
+                        Ok(closest_coordinates)
+                    } else {
+                        Err(Box::new(ContentNotDiscovered))
+                    };
+                }
+                None => Err(Box::new(WorldNotDiscovered)),
+            }
+        }
+
+
+        pub fn find_closest2(
+            &self,
+            world: Vec<Vec<Option<Tile>>>,
+            robot: &impl Runnable,
+            content: Content,
+        ) -> Result<MapCoordinate, Box<dyn Error>> {
+            let hashmap = TileMapper::collection2(world);
             match hashmap {
                 Some(map) => {
                     // check if the hashmap contains the searched content

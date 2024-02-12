@@ -1224,4 +1224,143 @@ mod tests {
         );
         let _ = runner.unwrap().game_tick();
     }
+
+    #[test]
+    fn test_find_closest() {
+        struct TestRobot(Robot);
+        impl Runnable for TestRobot {
+            fn process_tick(&mut self, world: &mut World) {
+                let tool = TileMapper {};
+                // path the robot must follow
+                let directions = [
+                    Direction::Right,
+                    Direction::Down,
+                    Direction::Right,
+                    Direction::Down,
+                    Direction::Up,
+                    Direction::Right,
+                    Direction::Up,
+                    Direction::Right,
+                ];
+
+                //move the robot
+                for (_phase, dir) in directions.iter().enumerate() {
+                    go(self, world, dir.to_owned()).expect("");
+                }
+
+                let expected_result = MapCoordinate::new(3, 1);
+
+                match tool.find_closest(world, self, Content::Rock(0)) {
+                    Ok(result) => {
+                        assert_eq!(result, expected_result);
+                    }
+                    Err(e) => panic!("{}", e),
+                };
+            }
+            fn handle_event(&mut self, event: Event) {
+                println!();
+                println!("{:?}", event);
+                println!();
+            }
+            fn get_energy(&self) -> &Energy {
+                &self.0.energy
+            }
+            fn get_energy_mut(&mut self) -> &mut Energy {
+                &mut self.0.energy
+            }
+            fn get_coordinate(&self) -> &Coordinate {
+                &self.0.coordinate
+            }
+            fn get_coordinate_mut(&mut self) -> &mut Coordinate {
+                &mut self.0.coordinate
+            }
+            fn get_backpack(&self) -> &BackPack {
+                &self.0.backpack
+            }
+            fn get_backpack_mut(&mut self) -> &mut BackPack {
+                &mut self.0.backpack
+            }
+        }
+
+        struct WorldGenerator {
+            size: usize,
+            spawn_x: usize,
+            spawn_y: usize,
+            tile_type: TileType,
+        }
+
+        impl WorldGenerator {
+            fn new(size: usize, spawn_x: usize, spawn_y: usize, tile_type: TileType) -> Self {
+                Self {
+                    size,
+                    spawn_x,
+                    spawn_y,
+                    tile_type,
+                }
+            }
+        }
+
+        impl Generator for WorldGenerator {
+            fn gen(&mut self) -> WorldType {
+                let mut map: Vec<Vec<Tile>> = Vec::new();
+                // Initialize the map with default tiles
+                for _ in 0..self.size {
+                    let mut row: Vec<Tile> = Vec::new();
+                    for _ in 0..self.size {
+                        let tile = Tile {
+                            tile_type: self.tile_type,
+                            content: Content::None,
+                            elevation: 0,
+                        };
+                        row.push(tile);
+                    }
+                    map.push(row);
+                }
+                // add rocks
+                map[2][2] = Tile {
+                    tile_type: self.tile_type,
+                    content: Content::Rock(2),
+                    elevation: 0,
+                };
+                map[1][3] = Tile {
+                    tile_type: self.tile_type,
+                    content: Content::Rock(6),
+                    elevation: 0,
+                };
+                map[1][2] = Tile {
+                    tile_type: self.tile_type,
+                    content: Content::Rock(5),
+                    elevation: 0,
+                };
+                map[1][1] = Tile {
+                    tile_type: self.tile_type,
+                    content: Content::Rock(9),
+                    elevation: 0,
+                };
+                map[0][4] = Tile {
+                    tile_type: self.tile_type,
+                    content: Content::Coin(1),
+                    elevation: 0,
+                };
+
+                let environmental_conditions =
+                    EnvironmentalConditions::new(&vec![Sunny], 15, 12).unwrap();
+                // implementation
+                return (
+                    map,
+                    (self.spawn_x, self.spawn_y),
+                    environmental_conditions,
+                    10.0,
+                    None,
+                );
+            }
+        }
+
+        let r = TestRobot(Robot::new());
+        let runner = Runner::new(
+            Box::new(r),
+            &mut WorldGenerator::new(5, 0, 0, TileType::Grass),
+        );
+        let _ = runner.unwrap().game_tick();
+    }
 }
