@@ -1,7 +1,7 @@
 [package]
 authors = ["Another one bytes the Rust"]
 name = "tile-resource-mapper-tool"
-version = "1.0.0"
+version = "1.0.1"
 edition = "2021"
 description = "The Tile Resource Mapper Tool is a Rust library that creates a Hashmap with all the Contents discovered by the robot, including their quantity and coordinates."
 documentation = ""
